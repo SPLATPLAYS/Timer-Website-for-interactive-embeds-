@@ -34,23 +34,32 @@
         }
 
         .timer-display {
-            font-size: 36px;
-            font-weight: bold;
-            color: #ffffff;
-            background: conic-gradient(#4caf50 calc((1 - var(--progress)) * 360deg), rgba(255, 255, 255, 0.1) calc((1 - var(--progress)) * 360deg));
-            border-radius: 50%;
+            position: relative;
             width: 200px;
             height: 200px;
+            margin: 0 auto 20px;
+            background: conic-gradient(#4caf50 0deg, rgba(255, 255, 255, 0.1) 0deg);
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0 auto 20px;
-            position: relative;
+        }
+
+        .timer-display::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 50%;
+            z-index: 1;
         }
 
         .timer-display span {
             position: absolute;
             font-size: 32px;
+            color: #ffffff;
+            z-index: 2;
             text-align: center;
         }
 
@@ -84,8 +93,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Custom Timer</h1>
-        <div id="timer-display" class="timer-display" style="--progress: 1">
+        <h1>Custom Timer</h1> <!-- This will change dynamically -->
+        <div id="timer-display" class="timer-display">
             <span id="timer-text">20:00</span>
         </div>
         <div class="timer-buttons">
@@ -96,9 +105,13 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
+        const title = urlParams.get('title') || "Custom Timer";  // Default title if none is provided
         const hours = parseInt(urlParams.get('h')) || 0;
         const minutes = parseInt(urlParams.get('m')) || 20;
         const seconds = parseInt(urlParams.get('s')) || 0;
+
+        // Set the timer's title dynamically
+        document.querySelector('h1').textContent = title;
 
         const timerDuration = (hours * 3600) + (minutes * 60) + seconds;
         let remainingTime = timerDuration;
@@ -115,6 +128,7 @@
             timerText.textContent = `${hrs}:${mins}:${secs}`;
             const progress = remainingTime / timerDuration;
             timerDisplay.style.setProperty('--progress', progress);
+            timerDisplay.style.background = `conic-gradient(#4caf50 ${progress * 360}deg, rgba(255, 255, 255, 0.1) ${progress * 360}deg)`;
         }
 
         function startTimer() {
@@ -164,4 +178,3 @@
     </script>
 </body>
 </html>
-
