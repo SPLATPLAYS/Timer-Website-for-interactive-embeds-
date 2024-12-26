@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Timer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('b13.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 20px 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 320px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .timer-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            background: conic-gradient(#4caf50 calc((1 - var(--progress)) * 360deg), rgba(255, 255, 255, 0.1) calc((1 - var(--progress)) * 360deg));
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .timer-display span {
+            position: absolute;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        .timer-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .timer-button {
+            padding: 10px 15px;
+            background: #4caf50;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .timer-button:hover {
+            background: #45a049;
+        }
+
+        .timer-button:disabled {
+            background: #6e7f76;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Custom Timer</h1>
+        <div id="timer-display" class="timer-display" style="--progress: 1">
+            <span id="timer-text">20:00</span>
+        </div>
+        <div class="timer-buttons">
+            <button id="start-pause-button" class="timer-button">Start</button>
+            <button id="reset-button" class="timer-button" disabled>Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const hours = parseInt(urlParams.get('h')) || 0;
+        const minutes = parseInt(urlParams.get('m')) || 20;
+        const seconds = parseInt(urlParams.get('s')) || 0;
+
+        const timerDuration = (hours * 3600) + (minutes * 60) + seconds;
+        let remainingTime = timerDuration;
+        let timerInterval = null;
+        const timerDisplay = document.getElementById('timer-display');
+        const timerText = document.getElementById('timer-text');
+        const startPauseButton = document.getElementById('start-pause-button');
+        const resetButton = document.getElementById('reset-button');
+
+        function updateDisplay() {
+            const hrs = Math.floor(remainingTime / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((remainingTime % 3600) / 60).toString().padStart(2, '0');
+            const secs = (remainingTime % 60).toString().padStart(2, '0');
+            timerText.textContent = `${hrs}:${mins}:${secs}`;
+            const progress = remainingTime / timerDuration;
+            timerDisplay.style.setProperty('--progress', progress);
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                if (remainingTime > 0) {
+                    remainingTime--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('Time is up!');
+                    startPauseButton.textContent = 'Start';
+                    resetButton.disabled = false;
+                }
+            }, 1000);
+            startPauseButton.textContent = 'Pause';
+            resetButton.disabled = false;
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            startPauseButton.textContent = 'Start';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            remainingTime = timerDuration;
+            updateDisplay();
+            startPauseButton.textContent = 'Start';
+            resetButton.disabled = true;
+        }
+
+        startPauseButton.addEventListener('click', () => {
+            if (timerInterval) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        resetButton.addEventListener('click', resetTimer);
+
+        updateDisplay();
+    </script>
+</body>
+</html>
+
